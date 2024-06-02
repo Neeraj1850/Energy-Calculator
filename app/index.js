@@ -14,12 +14,14 @@ const Home = () => {
                 headerTitle: "",
                  headerShown: false  // 
         }}/>
-        <AppName style={styles.child} />
-        <UploadCard style={styles.child} />
-        <TouchableOpacity style={[styles.button, styles.child]}>
+    
+          <AppName />
+          <UploadCard />
+          <TouchableOpacity style={styles.button}>
             <Text style={styles.text}>Calculate</Text>
-        </TouchableOpacity>
-        <StatusBar />
+          </TouchableOpacity>
+          <StatusBar />
+        
     </SafeAreaView>
     );
 }
@@ -29,18 +31,19 @@ const Home = () => {
       flex: 1,
       backgroundColor: '#4F9C80',
       justifyContent: 'space-evenly',
-      alignItems: 'center'
-    },
-    child: {
-      marginVertical: 30,  // Add vertical margins to each child
+      alignItems: 'center',
+      gap: 30
     },
     button: {
       backgroundColor: '#D9D9D9',
       borderRadius: 20,
       alignSelf: 'center',
+      elevation: 10,
+      marginBottom: 130
     },
     text: {
       padding: 10,
+      fontFamily: 'InterSemiBold',
       textAlign: 'center',
       fontSize: 12,
       alignSelf: 'center'

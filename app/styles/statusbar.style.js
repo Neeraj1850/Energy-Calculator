@@ -1,31 +1,36 @@
 import {StyleSheet}  from "react-native";
 
 const styles = StyleSheet.create({
+ 
     container: {
-        flex: 1,
+        position: 'absolute',
+        right: 0,       // Aligns the container to the right of the screen
+        bottom: 0,      // Aligns the container to the bottom of the screen
         flexDirection: 'row',
-        width: 359,
         alignItems: 'flex-end',
         marginBottom: 20
     },
 
     button: {
-        flex: 1,
+        flex: 0.5,
         flexDirection: 'column',
-        justifyContent: 'center',
         alignItems: 'center',
-        justifyContent: 'space-evenly'
+        justifyContent: 'space-evenly',
+        elevation: 10,
+
     },
 
     icon: {
         resizeMode: 'contain',
-        marginBottom: 10
+        marginBottom: 8,
+        elevation: 10
     },
 
     text: {
-        alignSelf: 'center',
         color: 'white',
-        fontWeight: '400',
+        fontFamily: 'InterRegular',
+        fontSize: 12,
+        elevation: 10
     }
 })
 

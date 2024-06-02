@@ -1,0 +1,95 @@
+import { StyleSheet } from "react-native";
+
+const styles = StyleSheet.create({
+    frame: {
+        alignItems: 'center',
+        flexDirection: 'column',
+        padding: 21,
+        height: 1277,
+        position: 'relative',
+      },
+      div: {
+        alignItems: 'center',
+        backgroundColor: '#d9d9d9',
+        borderRadius: 10,
+        boxShadow: '0px 4px 4px #00000040',
+        flexDirection: 'column',
+        padding: 23,
+        position: 'relative',
+        width: 323,
+      },
+      textWrapper: {
+        color: '#000000',
+        fontFamily: "Inter-SemiBold",
+        fontSize: 17,
+        fontWeight: '600',
+        textAlign: 'center',
+        width: 221,
+      },
+      p: {
+        color: '#000000',
+        fontFamily: "Inter-Regular",
+        fontSize: 15,
+        fontWeight: '400',
+        width: 269,
+      },
+      div2: {
+        alignItems: 'center',
+        backgroundColor: '#d9d9d9',
+        borderRadius: 10,
+        boxShadow: '0px 4px 4px #00000040',
+        flexDirection: 'column',
+        height: 353,
+        padding: 23,
+        position: 'relative',
+        width: 323,
+      },
+      textWrapper2: {
+        color: '#000000',
+        fontFamily: "Inter-SemiBold",
+        fontSize: 17,
+        fontWeight: '600',
+        position: 'relative',
+        width: 196,
+      },
+      highClarityImages: {
+        color: '#000000',
+        fontFamily: "Inter-SemiBold",
+        fontSize: 15,
+        fontWeight: '400',
+        height: 255,
+        position: 'relative',
+        width: 285,
+      },
+      span: {
+        fontWeight: '600',
+      },
+      textWrapper3: {
+        fontFamily: "Inter-Regular",
+      },
+      textWrapper4: {
+        color: '#000000',
+        fontFamily: "Inter-SemiBold",
+        fontSize: 17,
+        fontWeight: '600',
+        textAlign: 'center',
+        width: 252,
+      },
+      div3: {
+        color: '#000000',
+        fontFamily: "Inter-SemiBold",
+        fontSize: 15,
+        fontWeight: '400',
+        position: 'relative',
+        width: 285,
+      },
+      textWrapper5: {
+        color: '#000000',
+        fontFamily: "Inter-SemiBold",
+        fontSize: 17,
+        fontWeight: '600',
+        textAlign: 'center',
+        width: 235,
+      }
+})
+export default styles
