@@ -48,17 +48,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 25, // consider making this dynamic if needed
-    width: width * 0.13, // dynamic width
     alignSelf: 'center',
     elevation: 10
   },
   textButton: {
-    color: 'black',
+    padding: 10,
     fontFamily: 'InterRegular',
-    fontSize: scaleFont(12), // dynamically scaled font size
     textAlign: 'center',
-    elevation: 10,
+    fontSize: 12,
+    alignSelf: 'center'
     
   },
 });

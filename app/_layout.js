@@ -1,6 +1,8 @@
-import { Stack } from "expo-router";
+import { Stack, Tabs } from "expo-router";
 import { useCallback } from "react";
 import { useFonts } from "expo-font";
+import AppName from "./components/AppName";
+
 ///import * as SplashScreen from "expo-splash-screen";
 
 //SplashScreen.preventAutoHideAsync();
@@ -21,7 +23,25 @@ const layout = () =>{
 
     if(!fontsLoaded) return null;
 
-    return <Stack onLayout ={onLayoutRootView}/>
+    return (
+        <Stack 
+            onLayout ={onLayoutRootView}
+            screenOptions={{
+                headerTitle: () => <AppName/>,
+                headerStyle: {
+                    backgroundColor: '#4F9C80',
+                },
+                headerTitleAlign: 'center',
+                headerShadowVisible: 'false'
+            }}>
+            <Stack.Screen 
+                name="(tabs)" 
+                options={{ 
+                    headerShown: true,
+                }} />
+        </Stack>
+        
+    )
 }
 
 

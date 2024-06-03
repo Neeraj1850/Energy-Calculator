@@ -4,7 +4,6 @@ const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 60,
         flexDirection: 'row', // Align children horizontally
         justifyContent: 'center',
         alignItems: 'center',

@@ -3,12 +3,7 @@ import {StyleSheet}  from "react-native";
 const styles = StyleSheet.create({
  
     container: {
-        position: 'absolute',
-        right: 0,       // Aligns the container to the right of the screen
-        bottom: 0,      // Aligns the container to the bottom of the screen
         flexDirection: 'row',
-        alignItems: 'flex-end',
-        marginBottom: 20
     },
 
     button: {
