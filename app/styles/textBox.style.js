@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         backgroundColor: '#4F9C80',
-        padding: 20,
+        padding: 30,
         gap: 20
     },
     section: {
@@ -13,7 +13,8 @@ const styles = StyleSheet.create({
         elevation: 10,
         flexDirection: 'column',
         padding: 20,
-        gap: 10
+        gap: 10,
+        width: '100%'
     },
     titleText: {
         color: '#000',

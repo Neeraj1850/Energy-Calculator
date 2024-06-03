@@ -1,27 +1,28 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 
 export default function TabLayout() {
   return (
     <Tabs screenOptions={{
         tabBarStyle: {
-            backgroundColor: '#D9D9D9',
-            height: 60,
-            borderRadius: 20,
-            bottom: 10,
-            left:10,
-            right:10,
-            position: 'absolute'
-        }
+            height: 70,
+            backgroundColor: '#4F9C80',
+            borderTopWidth: 0,
+            elevation: 0,
+            paddingBottom: 15
+        },
         }}>
       <Tabs.Screen
         name="Home"
         options={{
           title: 'Appliance',
           headerShown: false,
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="fridge-outline" size={26} color='black' />,
+          tabBarLabelStyle: {
+            fontSize: 12,
+            color: 'white'
+          },
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="fridge" size={30} color="white" />,
         }}
       />
       <Tabs.Screen
@@ -29,7 +30,11 @@ export default function TabLayout() {
         options={{
           title: 'Utility Bill',
           headerShown: false,
-          tabBarIcon: ({ color }) => <FontAwesome6 name="dollar" size={24} color="black" />,
+          tabBarLabelStyle: {
+            fontSize: 12,
+            color: 'white'
+          },
+          tabBarIcon: ({ color }) => <FontAwesome6 name="file-invoice-dollar" size={26} color="white" />,
         }}
       />
       <Tabs.Screen
@@ -37,7 +42,11 @@ export default function TabLayout() {
         options={{
           title: 'Help',
           headerShown: false,
-          tabBarIcon: ({ color }) => <Feather name="help-circle" size={26} color="black" />,
+          tabBarLabelStyle: {
+            fontSize: 12,
+            color: 'white'
+          },
+          tabBarIcon: ({ color }) => <FontAwesome6 name="circle-question" size={26} color="white" />,
         }}
       />
       <Tabs.Screen
@@ -45,7 +54,11 @@ export default function TabLayout() {
         options={{
           title: 'About',
           headerShown: false,
-          tabBarIcon: ({ color }) => <Feather name="info" size={26} color="black" />,
+          tabBarLabelStyle: {
+            fontSize: 12,
+            color: 'white'
+          },
+          tabBarIcon: ({ color }) => <FontAwesome6 name="circle-info" size={26} color="white" />,
         }}
       />
     </Tabs>

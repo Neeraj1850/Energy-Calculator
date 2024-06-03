@@ -32,7 +32,10 @@ const layout = () =>{
                     backgroundColor: '#4F9C80',
                 },
                 headerTitleAlign: 'center',
-                headerShadowVisible: 'false'
+                headerTransparent: 'true',
+                headerTitleContainerStyle: {
+                    paddingVertical: 50
+                }
             }}>
             <Stack.Screen 
                 name="(tabs)" 
