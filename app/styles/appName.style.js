@@ -4,19 +4,20 @@ const screenWidth = Dimensions.get('window').width;
 
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'row', // Align children horizontally
+        flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
+        height: 100
 
     },
     icon: {
-        resizeMode: 'contain', // Ensures the SVG scales correctly
+        resizeMode: 'contain',
         elevation: 10
     },
     text: {
         color: '#ffffff',
         fontFamily: 'InterBold',
-        fontSize: screenWidth * 0.06, // Example: 6% of screen width
+        fontSize: screenWidth * 0.06,
         elevation: 10
     }
 })

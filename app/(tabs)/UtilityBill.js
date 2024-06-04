@@ -1,18 +1,11 @@
 import { SafeAreaView, View, Text, TouchableOpacity } from "react-native";
-import AppName from "../components/AppName";
-import StatusBar from "../components/StatusBar";
 import styles from "../styles/uploadCard.style";
 import { Svg, Path } from "react-native-svg";
+import mainStyle from "../styles/general.style";
 
 const UtilityBill = () => {
     return(
-        <SafeAreaView style={{
-            flex: 1,
-            backgroundColor: '#4F9C80',
-            justifyContent: 'space-evenly',
-            alignItems: 'center',
-            gap: 20,
-        }}>
+        <SafeAreaView style={mainStyle.container}>
             <View style={styles.container}>
                 <View style={styles.miniContainer}>
                     <View style={styles.uploadContainerBox}>
@@ -25,25 +18,13 @@ const UtilityBill = () => {
                             </Svg>
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={styles.uploadButton}>
-                        <Text style={styles.textButton}>Upload</Text>
+                    <TouchableOpacity style={mainStyle.button}>
+                        <Text style={mainStyle.text}>Upload</Text>
                     </TouchableOpacity>     
                 </View>
             </View>
-            <TouchableOpacity style={{
-                backgroundColor: '#D9D9D9',
-                borderRadius: 20,
-                alignSelf: 'center',
-                elevation: 10,
-                marginBottom: 130
-            }}>
-                <Text style={{
-                    padding: 10,
-                    fontFamily: 'InterSemiBold',
-                    textAlign: 'center',
-                    fontSize: 12,
-                    alignSelf: 'center'
-                }}>Analyze</Text>
+            <TouchableOpacity style={mainStyle.button}>
+                <Text style={mainStyle.text}>Analyze</Text>
             </TouchableOpacity>
         </SafeAreaView>
     )

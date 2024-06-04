@@ -1,6 +1,28 @@
-import { Pressable, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { Svg, Path } from "react-native-svg";
 import styles from "../styles/uploadCard.style";
+import mainStyle from "../styles/general.style";
+import { useState } from "react";
+import * as ImagePicker from 'expo-image-picker';
+
+const ImagePickerExample = () => {
+  const [image, setImage] = useState(null);
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  }};
 
 const UploadCard = () => {
     return(
@@ -16,8 +38,8 @@ const UploadCard = () => {
                         </Svg>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.uploadButton}>
-                    <Text style={styles.textButton}>Upload</Text>
+                <TouchableOpacity style={mainStyle.button}>
+                    <Text style={mainStyle.text}>Upload</Text>
                 </TouchableOpacity>     
             </View>
             <View style={styles.miniContainer}>
@@ -31,8 +53,8 @@ const UploadCard = () => {
                         </Svg>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.uploadButton}>
-                    <Text style={styles.textButton}>Upload</Text>
+                <TouchableOpacity style={mainStyle.button}>
+                    <Text style={mainStyle.text}>Upload</Text>
                 </TouchableOpacity>
             </View>
         </View>

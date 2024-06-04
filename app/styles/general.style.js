@@ -1,0 +1,34 @@
+import { StyleSheet } from "react-native";
+
+const mainStyle = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 30,
+        alignItems: 'center',
+        gap: 30,
+        backgroundColor: '#4F9C80',
+        justifyContent: 'center'
+    },
+    scrollView: {
+        padding: 30,
+        alignItems: 'center',
+        gap: 20,
+        backgroundColor: '#4F9C80'
+
+    },
+    button: {
+        backgroundColor: '#D9D9D9',
+        borderRadius: 20,
+        alignSelf: 'center',
+        elevation: 10
+      },
+      text: {
+        padding: 10,
+        fontFamily: 'InterSemiBold',
+        textAlign: 'center',
+        fontSize: 12,
+        alignSelf: 'center'
+      }
+})
+
+export default mainStyle;

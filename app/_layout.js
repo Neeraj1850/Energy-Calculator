@@ -41,7 +41,7 @@ const layout = () =>{
                 name="(tabs)" 
                 options={{ 
                     headerShown: true,
-                }} />
+                }}/>
         </Stack>
         
     )

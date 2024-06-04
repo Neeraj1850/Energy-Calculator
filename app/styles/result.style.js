@@ -5,30 +5,30 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#d9d9d9',
         borderRadius: 20,
-        display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         padding: 20,
         width: '90%', // Dynamic width for better responsiveness
         alignSelf: 'center',
     },
-    infoBlock: {
+    infoRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 10,
-        width: '100%', // Full width of the container
+        paddingVertical: 20,
+        width: '100%',
+        alignItems: 'center'
     },
     label: {
         fontSize: 15,
-        fontWeight: '300',
-        color: '#000',
+        fontFamily: 'InterRegular',
+        color: '#000'
     },
     value: {
         fontSize: 15,
-        fontWeight: '300',
+        fontFamily: 'InterRegular',
         color: '#000',
         textAlign: 'right',
-    },
+    }
 });
 
 export default styles;

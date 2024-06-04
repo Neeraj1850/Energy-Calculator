@@ -1,10 +1,11 @@
 import React from 'react';
 import { ScrollView, Text, View } from "react-native";
 import styles from "../styles/textBox.style";
+import mainStyle from '../styles/general.style';
 
 const HelpPage = () => {
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={mainStyle.scrollView}>
             <View style={styles.section}>
                 <Text style={styles.titleText}>Help Guide: Getting the Most from Ecowatt</Text>
                 <Text style={styles.contentText}>
