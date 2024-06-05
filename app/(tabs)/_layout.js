@@ -2,11 +2,30 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Stack, Tabs } from 'expo-router';
 import { Svg, Path } from 'react-native-svg';
+import { Ionicons } from '@expo/vector-icons';
+import AppName from '../components/AppName';
+import { router } from 'expo-router';
 
 export default function TabLayout() {
   return (
       <Tabs
         screenOptions={{
+          headerTitle: () => <AppName/>,
+                headerLeft: router.canGoBack() ? () =>
+                    <Ionicons 
+                      name="arrow-back-sharp" 
+                      size={24} color="white"
+                      style={{
+                        paddingLeft: 20
+                      }}
+                      onPress={ () => router.back()}/> : null,
+                headerStyle: {
+                    backgroundColor: '#4F9C80',
+                    borderBottomWidth: 0,
+                    elevation: 0,
+                    height: 100
+                },
+                headerTitleAlign: 'center',
         tabBarStyle: {
             height: 70,
             backgroundColor: '#4F9C80',
@@ -19,7 +38,7 @@ export default function TabLayout() {
         name="Home"
         options={{
           title: 'Appliance',
-          headerShown: false,
+          headerShown: true,
           tabBarLabelStyle: {
             fontSize: 12,
             color: 'white'
@@ -31,7 +50,8 @@ export default function TabLayout() {
         name="UtilityBill"
         options={{
           title: 'Utility Bill',
-          headerShown: false,
+          headerShown: true,
+          headerLeft: () => null,
           tabBarLabelStyle: {
             fontSize: 12,
             color: 'white'
@@ -43,7 +63,8 @@ export default function TabLayout() {
         name="Help"
         options={{
           title: 'Help',
-          headerShown: false,
+          headerShown: true,
+          headerLeft: () => null,
           tabBarLabelStyle: {
             fontSize: 12,
             color: 'white'
@@ -55,7 +76,8 @@ export default function TabLayout() {
         name="About"
         options={{
           title: 'About',
-          headerShown: false,
+          headerShown: true,
+          headerLeft: () => null,
           tabBarLabelStyle: {
             fontSize: 12,
             color: 'white'

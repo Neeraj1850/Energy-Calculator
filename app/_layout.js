@@ -29,22 +29,14 @@ const layout = () =>{
         <Stack 
             onLayout ={onLayoutRootView}
             screenOptions={{
-                headerTitle: () => <AppName/>,
-                headerLeft: router.canGoBack() ? () => 
-                    <Ionicons name="arrow-back-sharp" size={24} color="white" onPress={ () => router.back()}/> : undefined,
-                headerStyle: {
-                    backgroundColor: '#4F9C80',
-                },
-                headerTitleAlign: 'center',
-                headerTransparent: 'true',
-                headerTitleContainerStyle: {
-                    paddingVertical: 50
-                }
+                headerLeft: () => null,
+                
             }}>
             <Stack.Screen 
                 name="(tabs)"
                 options={{ 
-                    headerShown: true,
+                    headerShown: false,
+                    headerLeft: () => null,
                 }}/>
         </Stack>
         
