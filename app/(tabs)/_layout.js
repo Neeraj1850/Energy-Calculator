@@ -1,11 +1,11 @@
 import { FontAwesome6 } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Stack, Tabs } from 'expo-router';
 import { Svg, Path } from 'react-native-svg';
 
 export default function TabLayout() {
   return (
-    <Tabs
+      <Tabs
         screenOptions={{
         tabBarStyle: {
             height: 70,

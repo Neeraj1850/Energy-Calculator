@@ -10,11 +10,12 @@ const styles = StyleSheet.create({
         padding: 20,
         width: '90%', // Dynamic width for better responsiveness
         alignSelf: 'center',
+        elevation: 20
     },
     infoRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingVertical: 20,
+        paddingVertical: 10,
         width: '100%',
         alignItems: 'center'
     },

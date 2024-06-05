@@ -3,8 +3,10 @@ import { Text, TouchableOpacity, SafeAreaView } from "react-native";
 import { router } from "expo-router";
 import UploadCard from "../../components/UploadCard";
 import mainStyle from "../../styles/general.style";
+import { Link, useNavigation } from 'expo-router';
 
 const Home = () => {
+  const navigation = useNavigation();
     return (
     <SafeAreaView style={mainStyle.container}>
           <UploadCard />
@@ -16,6 +18,7 @@ const Home = () => {
         
     </SafeAreaView>
     );
+
 }
 
 export default Home;

@@ -1,8 +1,9 @@
-import { Stack, Tabs } from "expo-router";
+import { Navigator, Stack, Tabs, router } from "expo-router";
 import { useCallback } from "react";
 import { useFonts } from "expo-font";
 import AppName from "./components/AppName";
-
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 ///import * as SplashScreen from "expo-splash-screen";
 
 //SplashScreen.preventAutoHideAsync();
@@ -15,11 +16,12 @@ const layout = () =>{
         InterSemiBold: require('./fonts/Inter-SemiBold.ttf')
 
     })
-    const onLayoutRootView = useCallback(async() => {
-        if(fontsLoaded) {
+
+    const onLayoutRootView = useCallback(async () => {
+        if (fontsLoaded) {
             await SplashScreen.hideAsync();
         }
-    }, [fontsLoaded])
+    }, [fontsLoaded]);
 
     if(!fontsLoaded) return null;
 
@@ -28,6 +30,8 @@ const layout = () =>{
             onLayout ={onLayoutRootView}
             screenOptions={{
                 headerTitle: () => <AppName/>,
+                headerLeft: router.canGoBack() ? () => 
+                    <Ionicons name="arrow-back-sharp" size={24} color="white" onPress={ () => router.back()}/> : undefined,
                 headerStyle: {
                     backgroundColor: '#4F9C80',
                 },
@@ -38,7 +42,7 @@ const layout = () =>{
                 }
             }}>
             <Stack.Screen 
-                name="(tabs)" 
+                name="(tabs)"
                 options={{ 
                     headerShown: true,
                 }}/>

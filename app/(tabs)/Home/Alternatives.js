@@ -1,12 +1,24 @@
 import React from 'react';
-import { View, Text, SafeAreaView } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView } from 'react-native';
 import styles from '../../styles/result.style';
 import mainStyle from '../../styles/general.style';
 
 const AlternativesInfo = () => {
     return (
-        <SafeAreaView style={mainStyle.container}>
-            <View style={styles.container}>
+        <ScrollView contentContainerStyle={mainStyle.scrollView}>
+            
+            <Card />
+            <Card />
+            <Card />
+
+        </ScrollView>
+        
+    );
+};
+
+const Card = () => {
+    return(
+        <View style={styles.container}>
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>Appliance:</Text>
                     <Text style={styles.value}>Refrigerator</Text>
@@ -32,10 +44,6 @@ const AlternativesInfo = () => {
                     <Text style={styles.value}>$100/Month</Text>
                 </View>
             </View>
-
-        </SafeAreaView>
-        
-    );
-};
-
+    )
+}
 export default AlternativesInfo;

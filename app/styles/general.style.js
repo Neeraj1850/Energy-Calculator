@@ -16,6 +16,14 @@ const mainStyle = StyleSheet.create({
         backgroundColor: '#4F9C80'
 
     },
+    horizontalScrollView: {
+      alignItems: 'center',
+      flexDirection: 'row',
+      padding: 30,
+      justifyContent: 'flex-start',
+      gap: 20,
+      backgroundColor: '#4F9C80'
+    },
     button: {
         backgroundColor: '#D9D9D9',
         borderRadius: 20,
