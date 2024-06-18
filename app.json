@@ -6,7 +6,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-image-picker"
     ],
     "name": "app",
     "slug": "app"
