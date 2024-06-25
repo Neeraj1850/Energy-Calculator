@@ -3,89 +3,94 @@ import { View, Text, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'r
 import styles from '../../styles/result.style'
 import mainStyle from '../../styles/general.style';
 import { router, useLocalSearchParams } from 'expo-router';
-import axios from 'axios';
+
 
 const ResultInfo = () => {
+    const {uri, fileName, mimeType} = useLocalSearchParams();
+    const [loading, setloading] = useState(false)
+    const [data, setData] = useState(null);
 
-    const {appliance, price} = useLocalSearchParams()
-
-    console.log(appliance, price)
-
-    //const [loading, setLoading] = useState(true);
-    //const [applianceData, setApplianceData] = useState(null);
-    //const { uri, name, type } = useLocalSearchParams();
-
-    // async function fetchData() {
-
-    //     const formData = new FormData();
-    //     formData.append('appliance_photo', {
-    //         uri: "file:///data/user/0/host.exp.exponent/cache/ExperienceData/%40anonymous%2Fapp-cafa0c31-fada-4505-80f8-7af3d8daf5cf/ImagePicker/f62aa7cc-9b55-4801-bd73-1684f9f64ecd.webp",
-    //         name: 'upload.webp',
-    //         type: 'image/webp'
-    //     });
+    const fetchData = async () => {
+        if(uri){
+            setloading(true)
+            const formData = new FormData();
+            formData.append('appliance_photo', {
+                uri: uri.replaceAll('%','%25'),
+                name: fileName,
+                type: mimeType
+            });
         
-    //     try {
-    //         console.log('Sending FormData', formData._parts[0]);
-    //         const response = await fetch('http://10.0.0.176:8000/upload/', {
-    //             method: 'POST',
-    //             body: formData,
-    //             headers: {
-    //               'Accept': 'application/json',
-    //             },
-    //         })
-    //         console.log(response)
-    //         if (!response.ok) {
-    //             throw new Error(`HTTP status ${response.status}`);
-    //         }
-    //         const responseData = await response.json();
-    //         console.log('responseData',responseData)
-    //         console.log('Fetch successful:', responseData);
-    //     } catch (error) {
-    //         console.error('Fetch error:', error);
-    //         alert('Failed to fetch data');
-    //     }
-    // }
+            try {
+                const response = await fetch('http://10.0.0.176:8000/upload/',{
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                })
+                if(!response.ok){
+                    alert(response.status)
+                    throw new Error(`Error ${response.status}`)
+                }
+                const data = await response.json()
+                setData(data)
+            } catch (error) {
+                alert('Fetch Error',error)
+            } finally {
+                setloading(false)
+            }
+        } else {
+            alert('Failed to fetch Image')
+        }
+    }
 
-    
-    // fetchData();
+    useEffect(() => {
+        fetchData()
+    },[])
 
-    // if (loading) {
-    //     return (
-    //         <ActivityIndicator style={{
-    //             flex: 1,
-    //             justifyContent: 'center',
-    //             alignItems: 'center',
-    //             backgroundColor: '#4F9C80'
-    //         }} size="large" color="#D9D9D9"/>
-    //     );
-    // }
+    const alternativesPage = () => {
+        if(data) {
+            const kwh = (data.totalCost)/0.33
+            router.navigate({
+                pathname: 'Home/Alternatives',
+                params: {
+                    power: kwh,
+                    appliance: data.predictedClass
+                }
+            })
+        } else {
+            alert ('Error fetching data')
+        }
+    }
+
     return (
         <SafeAreaView style={mainStyle.container}>
-            <View style={styles.container}>
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>Appliance:</Text>
-                    <Text style={styles.value}>{appliance}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>Brand:</Text>
-                    <Text style={styles.value}>{NaN}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>Type:</Text>
-                    <Text style={styles.value}>{NaN}</Text>
-                </View>
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>Power{'\n'}Consumption:</Text>
-                    <Text style={styles.value}>{price}</Text>
-                </View>
+        {loading ? (<ActivityIndicator size= 'large' color='#d9d9d9' />) : (
+        <><View style={styles.container}>
+            <View style={styles.infoRow}>
+                <Text style={styles.label}>Appliance:</Text>
+                <Text style={styles.value}>{data?.predictedClass}</Text>
             </View>
-            <TouchableOpacity style={mainStyle.button}>
-                <Text style={mainStyle.text} onPress={() => {
-                    router.navigate('./Alternatives')
-                }}>Alternatives</Text>
-            </TouchableOpacity>
-        </SafeAreaView>
-
+            <View style={styles.infoRow}>
+                <Text style={styles.label}>Brand:</Text>
+                <Text style={styles.value}>{NaN}</Text>
+            </View>
+            <View style={styles.infoRow}>
+                <Text style={styles.label}>Type:</Text>
+                <Text style={styles.value}>{NaN}</Text>
+            </View>
+            <View style={styles.infoRow}>
+                <Text style={styles.label}>Power{'\n'}Consumption:</Text>
+                <Text style={styles.value}>{data?.totalCost}</Text>
+            </View>
+        </View>
+        <TouchableOpacity style={mainStyle.button}>
+                <Text style={mainStyle.text} onPress={() => alternativesPage()}>Alternatives</Text>
+        </TouchableOpacity></>
+            
+        )}
+        
+    </SafeAreaView>
     );
 };
 

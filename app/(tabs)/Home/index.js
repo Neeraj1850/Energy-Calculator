@@ -10,7 +10,6 @@ import { router } from "expo-router";
 const Home = () => {
 
   const [image, setImage] = useState()
-  const [info, setInfo] = useState()
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -19,41 +18,25 @@ const Home = () => {
     });
 
     if (!result.canceled && result.assets) {
-      const image = result.assets[0];
-      setImage(image)
-      const formData = new FormData();
-      formData.append('appliance_photo', {
-        uri: image.uri,
-        name: image.fileName || 'upload.webp',
-        type: 'image/webp'
-      })
+      setImage(result.assets[0])
+    }
+  };
 
-      try {
-        const response = await fetch('http://10.0.0.176:8000/upload/', {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'Accept': 'application/json',
-          },
+  const resultPage = async () => {
+    if (image) {
+        router.navigate({
+          pathname: 'Home/Result',
+          params: {
+            uri: image.uri,
+            fileName: image.fileName,
+            mimeType: image.mimeType
+          }
         });
-      
-        if (!response.ok) {
-          throw new Error(`HTTP status ${response.status}`);
-        }
-  
-        const data = await response.json();
-        setInfo(data)
-        console.log(data);
-        alert('Success', data);
-  
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        alert('ERROR', error.toString());
-      }
+    } else {
+      alert('Please select image first')
     }
     
-  }
-
+  };
 
   return (
   <SafeAreaView style={mainStyle.container}>
@@ -91,19 +74,7 @@ const Home = () => {
         </View>
         <TouchableOpacity 
           style={mainStyle.button}
-          onPress={() => {
-            if (image) {
-              router.navigate({
-                pathname: 'Home/Result',
-                params: {
-                  appliance: info.predictedClass,
-                  price: info.totalCost
-                }
-              });
-            } else {
-              alert('Please select an image first.');
-            }
-        }}>
+          onPress={() => resultPage()}>
           <Text style={mainStyle.text}>Calculate</Text>
         </TouchableOpacity>
       

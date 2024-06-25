@@ -4,6 +4,7 @@ from starlette.responses import JSONResponse
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array, load_img
 from tensorflow.keras.applications.vgg16 import preprocess_input
+from pydantic import BaseModel
 import numpy as np
 from PIL import Image
 import re
@@ -108,6 +109,38 @@ async def upload_file(file: UploadFile = File(...)):
     # You could save the file here, process it, or just check it
     # Returning a simple confirmation here
     return {"filename": file.filename, "status": "File received successfully"}
+
+class ApplianceRequest(BaseModel):
+    kwh_value: float
+    appliance_type: str
+
+
+# Updated function using a Pydantic model for request body
+@app.post("/alternatives/")
+async def fetch_appliances(request: ApplianceRequest):
+    async with db_pool.acquire() as connection:
+        # Safely get the table name from the appliance type
+        table_name = APPLIANCE_TYPE_TO_TABLE.get(request.appliance_type)
+        if not table_name:
+            return {"detail": "Invalid appliance type"}, 400
+
+        query_text = f"""
+            SELECT model_num, brand_name, aec 
+            FROM {table_name}
+            WHERE aec < $1
+            ORDER BY aec ASC
+            LIMIT 5;
+        """
+
+        try:
+            result = await connection.fetch(query_text, request.kwh_value)
+            if result:
+                return [dict(record) for record in result]
+            else:
+                return [], 204
+        except Exception as e:
+            return {"detail": str(e)}, 500
+                        
 
 
 @app.post("/upload/")
