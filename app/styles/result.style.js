@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         padding: 20,
-        width: '90%', // Dynamic width for better responsiveness
+        width: '90%', 
         alignSelf: 'center',
         elevation: 20
     },
@@ -22,13 +22,17 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 15,
         fontFamily: 'InterRegular',
-        color: '#000'
+        color: '#000',
+        flex: 1, 
+        flexWrap: 'wrap',
     },
     value: {
         fontSize: 15,
+        flex: 1, 
         fontFamily: 'InterRegular',
         color: '#000',
         textAlign: 'right',
+        flexWrap: 'wrap', 
     }
 });
 

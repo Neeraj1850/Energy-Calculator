@@ -6,18 +6,29 @@ import { router, useLocalSearchParams } from 'expo-router';
 
 
 const ResultInfo = () => {
-    const {uri, fileName, mimeType} = useLocalSearchParams();
+    const { applianceImageURI,
+            applianceImageName,
+            applianceImageMIME,
+            stickerImageURI,
+            stickerImageName,
+            stickerImageMIME
+        } = useLocalSearchParams();
     const [loading, setloading] = useState(false)
     const [data, setData] = useState(null);
 
     const fetchData = async () => {
-        if(uri){
+        if(applianceImageURI && stickerImageURI){
             setloading(true)
             const formData = new FormData();
             formData.append('appliance_photo', {
-                uri: uri.replaceAll('%','%25'),
-                name: fileName,
-                type: mimeType
+                uri: applianceImageURI.replaceAll('%','%25'),
+                name: applianceImageName,
+                type: applianceImageMIME
+            });
+            formData.append('energy_sticker', {
+                uri: stickerImageURI.replaceAll('%','%25'),
+                name: stickerImageName,
+                type: stickerImageMIME
             });
         
             try {

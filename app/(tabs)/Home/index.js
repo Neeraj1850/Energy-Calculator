@@ -9,27 +9,42 @@ import { router } from "expo-router";
 
 const Home = () => {
 
-  const [image, setImage] = useState()
+  const [applianceImage, setApplianceImage] = useState()
+  const [stickerImage, setStickerImage] = useState()
 
-  const pickImage = async () => {
+  const pickApplianceImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       quality: 1,
     });
 
     if (!result.canceled && result.assets) {
-      setImage(result.assets[0])
+      setApplianceImage(result.assets[0])
+    }
+  };
+
+  const pickStickerImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets) {
+      setStickerImage(result.assets[0])
     }
   };
 
   const resultPage = async () => {
-    if (image) {
+    if (applianceImage && stickerImage) {
         router.navigate({
           pathname: 'Home/Result',
           params: {
-            uri: image.uri,
-            fileName: image.fileName,
-            mimeType: image.mimeType
+            applianceImageURI: applianceImage.uri,
+            applianceImageName: applianceImage.fileName,
+            applianceImageMIME: applianceImage.mimeType,
+            stickerImageURI: stickerImage.uri,
+            stickerImageName: stickerImage.fileName,
+            stickerImageMIME: stickerImage.mimeType
           }
         });
     } else {
@@ -52,7 +67,7 @@ const Home = () => {
                         </Svg>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={mainStyle.button} onPress={() => pickImage()}>
+                <TouchableOpacity style={mainStyle.button} onPress={() => pickApplianceImage()}>
                     <Text style={mainStyle.text}>Upload</Text>
                 </TouchableOpacity>     
             </View>
@@ -67,7 +82,7 @@ const Home = () => {
                         </Svg>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={mainStyle.button} onPress={() => pickImage()}>
+                <TouchableOpacity style={mainStyle.button} onPress={() => pickStickerImage()}>
                     <Text style={mainStyle.text}>Upload</Text>
                 </TouchableOpacity>
             </View>

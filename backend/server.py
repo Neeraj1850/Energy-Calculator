@@ -1,8 +1,9 @@
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
+import pandas as pd
+from sodapy import Socrata
 from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.image import img_to_array, load_img
+from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications.vgg16 import preprocess_input
 from pydantic import BaseModel
 import numpy as np
@@ -28,6 +29,11 @@ TESSERACT_CMD = os.getenv('TESSERACT_CMD')
 MODEL_PATH = os.getenv('MODEL_PATH')
 CORS_ORIGIN = os.getenv('CORS_ORIGIN')
 UNIT_COST_PER_KWH = float(os.getenv('UNIT_COST_PER_KWH', 0.33))
+APP_TOKEN = os.getenv("APP_TOKEN")
+USERNAME = os.getenv("USERNAME")
+PASSWORD = os.getenv("PASSWORD")
+
+
 
 pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
 
@@ -62,7 +68,7 @@ db_pool = None
 async def startup_event():
     global db_pool, model
     db_pool = await create_db_pool()
-    model = load_model(MODEL_PATH)  # Load your pre-trained model
+    model = load_model(MODEL_PATH)  
     print("Database pool and model are ready")
 
 APPLIANCE_TYPE_TO_TABLE = {
@@ -73,7 +79,16 @@ APPLIANCE_TYPE_TO_TABLE = {
     'Dish Washer': 'DishWasher'
 }
 
-from fastapi import HTTPException
+
+@app.post("/fetch-data/")
+async def fetch_data():
+    client = Socrata("data.energystar.gov", APP_TOKEN, USERNAME, PASSWORD)
+    try:
+        results = client.get("8t9c-g3tn", where="us_federal_standard_kwh_yr > 500", limit="5")
+        results_df = pd.DataFrame.from_records(results)
+        return results_df.to_dict(orient='records')
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
     
 
 @app.get("/appliances/{appliance_type}")
@@ -103,23 +118,14 @@ async def fetch_appliance_data(appliance_type: str, page: int = 1):
             raise HTTPException(status_code=500, detail=f"Error fetching appliances: {str(e)}")
         
 
-@app.post("/mock")
-async def upload_file(file: UploadFile = File(...)):
-    content = await file.read()
-    # You could save the file here, process it, or just check it
-    # Returning a simple confirmation here
-    return {"filename": file.filename, "status": "File received successfully"}
-
 class ApplianceRequest(BaseModel):
     kwh_value: float
     appliance_type: str
 
-
-# Updated function using a Pydantic model for request body
 @app.post("/alternatives/")
 async def fetch_appliances(request: ApplianceRequest):
     async with db_pool.acquire() as connection:
-        # Safely get the table name from the appliance type
+        
         table_name = APPLIANCE_TYPE_TO_TABLE.get(request.appliance_type)
         if not table_name:
             return {"detail": "Invalid appliance type"}, 400

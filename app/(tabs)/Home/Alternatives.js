@@ -17,12 +17,8 @@ const AlternativesInfo = () => {
                 appliance_type: appliance
             };
             try {
-                const response = await fetch('http://10.0.0.176:8000/alternatives/', {
+                const response = await fetch('http://10.0.0.176:8000/fetch-data/', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json', 
-                    },
-                    body: JSON.stringify(body),
                 });
                 if (!response.ok) {
                     throw new Error(`HTTP status ${response.status}`);
@@ -43,34 +39,43 @@ const AlternativesInfo = () => {
         fetchData();
     }, []);  
 
+    if (loading) {
+        return (
+            <View style={mainStyle.container}>
+                <ActivityIndicator size="large" color="#d9d9d9" />
+            </View>
+        );
+    }
+
     return (
         <ScrollView contentContainerStyle={mainStyle.scrollView}>
-            {loading ? (
-                <ActivityIndicator size= 'large' color='#d9d9d9' />
-            ) : (
-                data.map((appliance, index) => (
-                    <Card
-                        key={index}
-                        type={appliance.model_num}  
-                        brand={appliance.brand_name}
-                        powerConsumption={(appliance.aec * 0.33).toFixed(2)}
-                    />
-                ))
-            )}
+            {data.map((appliance, index) => (
+                <Card
+                    key={index}
+                    type={appliance.model_number}
+                    brand={appliance.brand_name}
+                    powerConsumption={appliance.annual_energy_use_kwh_yr}
+                    upc={appliance.upc}
+                />
+            ))}
         </ScrollView>
     );
 };
 
-const Card = ({ type, brand, powerConsumption }) => {
+const Card = ({ type, brand, powerConsumption, upc }) => {
     return (
         <View style={styles.container}>
             <View style={styles.infoRow}>
-                <Text style={styles.label}>Model Number:</Text>
+                <Text style={styles.label}>Model:</Text>
                 <Text style={styles.value}>{type}</Text>
             </View>
             <View style={styles.infoRow}>
                 <Text style={styles.label}>Brand:</Text>
                 <Text style={styles.value}>{brand}</Text>
+            </View>
+            <View style={styles.infoRow}>
+                <Text style={styles.label}>UPC:</Text>
+                <Text style={styles.value}>{upc || 'Unknown'}</Text>
             </View>
             <View style={styles.infoRow}>
                 <Text style={styles.label}>Power{'\n'}Consumption:</Text>

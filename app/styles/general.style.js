@@ -7,14 +7,14 @@ const mainStyle = StyleSheet.create({
         alignItems: 'center',
         gap: 30,
         backgroundColor: '#4F9C80',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        width: '100%'
     },
     scrollView: {
         padding: 30,
         alignItems: 'center',
         gap: 20,
         backgroundColor: '#4F9C80'
-
     },
     horizontalScrollView: {
       alignItems: 'center',
