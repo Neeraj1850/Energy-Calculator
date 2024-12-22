@@ -7,7 +7,15 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-image-picker"
+      "expo-image-picker",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow App to access your camera",
+          "microphonePermission": "Allow App to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
     ],
     "name": "app",
     "slug": "app"

@@ -1,7 +1,5 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import pandas as pd
-from sodapy import Socrata
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.applications.vgg16 import preprocess_input
@@ -11,33 +9,21 @@ from PIL import Image
 import re
 from io import BytesIO
 import uvicorn
-import asyncpg
 import pytesseract
 import os
+import json
+import httpx
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
-# Use environment variables
-DATABASE_USER = os.getenv('DATABASE_USER')
-DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
-DATABASE_HOST = os.getenv('DATABASE_HOST')
-DATABASE_PORT = os.getenv('DATABASE_PORT')
-DATABASE_NAME = os.getenv('DATABASE_NAME')
-TESSERACT_CMD = os.getenv('TESSERACT_CMD')
 MODEL_PATH = os.getenv('MODEL_PATH')
 CORS_ORIGIN = os.getenv('CORS_ORIGIN')
-UNIT_COST_PER_KWH = float(os.getenv('UNIT_COST_PER_KWH', 0.33))
-APP_TOKEN = os.getenv("APP_TOKEN")
-USERNAME = os.getenv("USERNAME")
-PASSWORD = os.getenv("PASSWORD")
+JSON_PATH = os.getenv('JSON_PATH')
+TESSERACT_CMD = os.getenv('TESSERACT_CMD')
+os.environ['TESSDATA_PREFIX'] = 'C:/Program Files/Tesseract-OCR/tessdata'
 
-
-
-pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
-
-model = None
+pytesseract.pytesseract.tesseract_cmd = os.getenv('TESSERACT_CMD')
 
 app = FastAPI()
 
@@ -52,112 +38,63 @@ app.add_middleware(
     allow_methods=["*"],  
     allow_headers=["*"], 
 )
-
-async def create_db_pool():
-    return await asyncpg.create_pool(
-        user=DATABASE_USER,
-        password=DATABASE_PASSWORD,
-        host=DATABASE_HOST,
-        port=DATABASE_PORT,
-        database=DATABASE_NAME
-    )
-
-db_pool = None
+model = None
+washing_machine_model = None
+refrigerator_model = None
 
 @app.on_event("startup")
 async def startup_event():
-    global db_pool, model
-    db_pool = await create_db_pool()
-    model = load_model(MODEL_PATH)  
-    print("Database pool and model are ready")
-
-APPLIANCE_TYPE_TO_TABLE = {
-    'Air Conditioner': 'AirConditioner',
-    'Washing Machine': 'WashingMachine',
-    'Refrigerator': 'Refrigerator',
-    'Oven': 'Oven',
-    'Dish Washer': 'DishWasher'
-}
-
-
-@app.post("/fetch-data/")
-async def fetch_data():
-    client = Socrata("data.energystar.gov", APP_TOKEN, USERNAME, PASSWORD)
+    global model, washing_machine_model, refrigerator_model
     try:
-        results = client.get("8t9c-g3tn", where="us_federal_standard_kwh_yr > 500", limit="5")
-        results_df = pd.DataFrame.from_records(results)
-        return results_df.to_dict(orient='records')
+        model = load_model(os.getenv('MODEL_PATH'))
+        washing_machine_model = load_model('D:/app/backend/models/vgg16_WM_submodel.h5')
+        refrigerator_model = load_model('D:/app/backend/models/vgg16_ref_submodel.h5')
+        print("Model is ready.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    
+        print(f"Failed to start properly: {e}")
 
-@app.get("/appliances/{appliance_type}")
-async def fetch_appliance_data(appliance_type: str, page: int = 1):
-    limit = 10
-    offset = (page - 1) * limit
-
-    table_name = APPLIANCE_TYPE_TO_TABLE.get(appliance_type)
-
-    if not table_name:
-        raise HTTPException(status_code=400, detail="Invalid appliance type")
-
-    async with db_pool.acquire() as connection:
-        try:
-            query = f"""
-                SELECT model_num, brand_name, aec 
-                FROM {table_name}
-                LIMIT $1 OFFSET $2;
-            """
-            result = await connection.fetch(query, limit, offset)
-
-            if result:
-                return [dict(record) for record in result]
-            else:
-                return []
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching appliances: {str(e)}")
-        
-
-class ApplianceRequest(BaseModel):
-    kwh_value: float
+class QueryParams(BaseModel):
     appliance_type: str
+    kwh_value: int 
 
-@app.post("/alternatives/")
-async def fetch_appliances(request: ApplianceRequest):
-    async with db_pool.acquire() as connection:
+@app.post("/fetch-data")
+async def fetch_data(params: QueryParams):
+    base_url = 'https://data.energystar.gov/resource/'
+    try:
+        with open(JSON_PATH, 'r') as file:
+            mapping = json.load(file)
         
-        table_name = APPLIANCE_TYPE_TO_TABLE.get(request.appliance_type)
-        if not table_name:
-            return {"detail": "Invalid appliance type"}, 400
+        if params.appliance_type in mapping:
+            appliance_code = mapping[params.appliance_type]["code"] + ".json"
+            aec_code = mapping[params.appliance_type]["aec"]
+        else:
+            raise ValueError("Appliance type not found in mapping")
 
-        query_text = f"""
-            SELECT model_num, brand_name, aec 
-            FROM {table_name}
-            WHERE aec < $1
-            ORDER BY aec ASC
-            LIMIT 5;
-        """
+        query = f"$where={aec_code} <= {params.kwh_value}"
+        limit = "$limit=5"
+        full_url = f"{base_url}{appliance_code}?{query}&{limit}"
 
-        try:
-            result = await connection.fetch(query_text, request.kwh_value)
-            if result:
-                return [dict(record) for record in result]
-            else:
-                return [], 204
-        except Exception as e:
-            return {"detail": str(e)}, 500
-                        
+        async with httpx.AsyncClient() as client:
+            response = await client.get(full_url)
+            response.raise_for_status() 
+            return response.json() 
 
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="JSON decoding error")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=500, detail=f"Request error: {str(exc)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 @app.post("/upload/")
 async def create_upload_file(energy_sticker: UploadFile = None, appliance_photo: UploadFile = File(...)):
+
     kwh_value = None
 
     # Check if the appliance photo is provided
-    if not appliance_photo.filename:
+    if not appliance_photo or not appliance_photo.filename:
         raise HTTPException(status_code=400, detail="Appliance photo file is required.")
-
-    # If energy sticker is provided, process it
+    
     if energy_sticker and energy_sticker.filename:
         try:
             contents = await energy_sticker.read()
@@ -170,88 +107,100 @@ async def create_upload_file(energy_sticker: UploadFile = None, appliance_photo:
     try:
         contents_appliance_photo = await appliance_photo.read()
         image_appliance_photo = Image.open(BytesIO(contents_appliance_photo))
-        predicted_class = predict_appliance_class(image_appliance_photo)
+        predicted_class = predict_appliance_class(image_appliance_photo)  
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process appliance photo: {str(e)}")
+    
+    # Handle subclass predictions based on predicted class
+    try:
+        if predicted_class == "Refrigerator":
+            subclass = await predict_refrigerator_subclass(image_appliance_photo)  
+        elif predicted_class == "Washing Machine":
+            subclass = await predict_washing_machine_subclass(image_appliance_photo) 
+    except Exception as e:
+        subclass = "NA"
 
-    # If energy sticker not provided, lookup UEC value for predicted appliance in database
+    # If energy sticker not provided, lookup AEC value in JSON
     if kwh_value is None:
         try:
-            async with db_pool.acquire() as connection:
-                uec_result = await connection.fetchrow(
-                    "SELECT uec FROM average_appliance_EC WHERE appliance = $1", predicted_class
-                )
-                if uec_result:
-                    kwh_value = uec_result['uec']
-                    print(kwh_value)
-                else:
-                    raise HTTPException(status_code=404, detail="Appliance not found in database")
+            with open(JSON_PATH, 'r' ) as file:
+                data = json.load(file)
+                if predicted_class in ("Refrigerator", "Washing Machine"):
+                    if subclass in data[predicted_class]:
+                        kwh_value = data[predicted_class][subclass]
+                    else:
+                        raise ValueError("Invalid Subclass")
+                else: 
+                    if predicted_class in data: 
+                        kwh_value =  data[predicted_class]
+                    else: 
+                        raise ValueError("Invalid Main Class")
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error fetching UEC from database: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Error fetching AEC {str(e)}")
     
+    # Calculate cost and fetch related appliances
     try:
-        appliances = await fetch_appliances_consuming_less_than(kwh_value, predicted_class)
         total_cost = "Not calculated"
         if kwh_value is not None:
-            total_cost = calculate_cost(kwh_value, 0.33)  # Assuming 0.33 is the unit cost per kWh
+            total_cost = calculate_cost(kwh_value, 0.1)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching appliances: {str(e)}")
 
-    return {"totalCost": total_cost, "appliances": appliances, "predictedClass": predicted_class}
-
-
-async def fetch_appliances_consuming_less_than(kwh_value, appliance_type):
-    async with db_pool.acquire() as connection:
-        # Safely get the table name from the appliance type
-        table_name = APPLIANCE_TYPE_TO_TABLE.get(appliance_type)
-        # If the table name is not found in the map, it's an invalid type
-        if not table_name:
-            raise HTTPException(status_code=400, detail="Invalid appliance type")
-
-        query = f"""
-            SELECT model_num, brand_name, aec 
-            FROM {table_name}
-            WHERE aec < $1
-            ORDER BY aec ASC
-            LIMIT 5;
-        """
-
-        try:
-            result = await connection.fetch(query, kwh_value)
-            if result:
-                return [dict(record) for record in result]
-            else:
-                return []
-        except Exception as e:
-            raise HTTPException(status_code=500, detail={str(e)})
+    return {"totalCost": total_cost, "predictedClass": predicted_class , "subclass": subclass}
 
 
 def extract_largest_kwh_value(image):
-    text = pytesseract.image_to_string(image, lang='eng')
-    kwh_values = re.findall(r'(\d+)\s*kWh', text)
-    kwh_numbers = [int(value) for value in kwh_values]
-    return max(kwh_numbers) if kwh_numbers else None
+    try:
+        text = pytesseract.image_to_string(image, lang='eng')
+        kwh_values = re.findall(r'(\d+)\s*kWh', text)
+        kwh_numbers = [int(value) for value in kwh_values]
+        return max(kwh_numbers) if kwh_numbers else None
+    except Exception as e:
+        return None
+
 
 def calculate_cost(kwh, unit_cost):
     return round(float(kwh) * unit_cost, 2)
 
-class_names = ['Air Conditioner', 'Dish Washer', 'Oven', 'Refrigerator', 'Washing Machine']
+class_names = ['Air Conditioner', 'Dish Washer', 'Microwave', 'Refrigerator', 'Washing Machine']
 
 def predict_appliance_class(image):
-    # Resize the image to the model's expected input size
     image_resized = image.resize((224, 224))
-
-    # Convert the resized PIL Image to a Numpy array and preprocess
     img_array = img_to_array(image_resized)
-    img_batch = np.expand_dims(img_array, axis=0)  # Add batch dimension for the model
-    img_preprocessed = preprocess_input(img_batch)  # Preprocess the image
+    img_batch = np.expand_dims(img_array, axis=0) 
+    img_preprocessed = preprocess_input(img_batch) 
     
     # Make prediction
     predictions = model.predict(img_preprocessed)
-    predicted_index = np.argmax(predictions, axis=1)[0]  # Get the index of the highest probability
+    predicted_index = np.argmax(predictions, axis=1)[0] 
     # Map the predicted index to the corresponding class name
     predicted_class_name = class_names[predicted_index]
     return predicted_class_name
+
+refrigerator_class_names = ['Compact', 'Bottom Freezer', 'Top Freezer']
+
+async def predict_refrigerator_subclass(image):
+    image_resized = image.resize((224, 224))
+    img_array = img_to_array(image_resized)
+    img_batch = np.expand_dims(img_array, axis=0)
+    img_preprocessed = preprocess_input(img_batch)
+    predictions = refrigerator_model.predict(img_preprocessed)
+    predicted_index = np.argmax(predictions, axis=1)[0]
+    predicted_class_name = refrigerator_class_names[predicted_index]
+    return predicted_class_name
+
+washing_machine_class_names = ['Top Load', 'Front Load']
+
+async def predict_washing_machine_subclass(image):
+    image_resized = image.resize((224, 224))
+    img_array = img_to_array(image_resized)
+    img_batch = np.expand_dims(img_array, axis=0)
+    img_preprocessed = preprocess_input(img_batch)
+    predictions = washing_machine_model.predict(img_preprocessed)
+    predicted_index = np.argmax(predictions, axis=1)[0]
+    predicted_class_name = washing_machine_class_names[predicted_index]
+    return predicted_class_name
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")

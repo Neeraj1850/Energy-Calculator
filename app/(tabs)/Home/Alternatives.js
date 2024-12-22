@@ -13,12 +13,16 @@ const AlternativesInfo = () => {
         if (power && appliance) {
             setLoading(true);
             const body = {
-                kwh_value: power,
-                appliance_type: appliance
+                kwh_value: parseInt(power),
+                appliance_type: appliance.toString()
             };
             try {
                 const response = await fetch('http://10.0.0.176:8000/fetch-data/', {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',  
+                    },
+                    body: JSON.stringify(body)
                 });
                 if (!response.ok) {
                     throw new Error(`HTTP status ${response.status}`);
@@ -54,7 +58,9 @@ const AlternativesInfo = () => {
                     key={index}
                     type={appliance.model_number}
                     brand={appliance.brand_name}
-                    powerConsumption={appliance.annual_energy_use_kwh_yr}
+                    powerConsumption={
+                        (appliance.type === "Washing Machine" || appliance.type === "Dishwasher") ? 
+                        appliance.annual_energy_use_kwh_year: appliance.annual_energy_use_kwh_yr}
                     upc={appliance.upc}
                 />
             ))}
@@ -79,7 +85,7 @@ const Card = ({ type, brand, powerConsumption, upc }) => {
             </View>
             <View style={styles.infoRow}>
                 <Text style={styles.label}>Power{'\n'}Consumption:</Text>
-                <Text style={styles.value}>{powerConsumption} $/Yr</Text>
+                <Text style={styles.value}>${powerConsumption}/Year</Text>
             </View>
         </View>
     );

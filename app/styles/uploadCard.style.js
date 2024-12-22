@@ -1,4 +1,5 @@
 import { StyleSheet, Dimensions } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 
 // Get the full screen dimensions
 const { width, height } = Dimensions.get('window');
@@ -22,6 +23,22 @@ const styles = StyleSheet.create({
   uploadContainerBox: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 20
+  },
+  monthContainer: {
+    backgroundColor: '#D9D9D9',
+    borderRadius: 20,
+    height: 32, // consider making this dynamic if needed
+    width: width * 0.3, // dynamic width based on screen size
+    justifyContent: 'center',
+    elevation: 10,
+  },
+  TextInput: {
+    backgroundColor: '#D9D9D9',
+    borderRadius: 20,
+    justifyContent: 'center',
+    height: 32, // consider making this dynamic if needed
+    width: width * 0.25, // dynamic width based on screen size
   },
   uploadContainer: {
     backgroundColor: '#D9D9D9',
@@ -41,7 +58,7 @@ const styles = StyleSheet.create({
     fontFamily: 'InterRegular',
     fontSize: scaleFont(14), // dynamically scaled font size
     textAlign: 'left',
-    paddingLeft: 8,
+    padding: 8,
   },
   uploadButton: {
     backgroundColor: '#D9D9D9',

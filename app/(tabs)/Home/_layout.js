@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Stack, router } from "expo-router";
 
 export default function HomeLayout() {

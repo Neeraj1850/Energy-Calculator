@@ -1,0 +1,31 @@
+{
+    "Washing Machine": 
+    {
+        "code": "bghd-e2wd",
+        "Top Load": "100",
+        "Front Load": "100",
+        "aec": "annual_energy_use_kwh_year"
+        
+    },
+    "Refrigerator": 
+    {
+        "code": "p5st-her9",
+        "Compact": "100",
+        "Top Freezer": "100",
+        "Bottom Freezer": "100",
+        "aec": "annual_energy_use_kwh_yr"
+    },
+    "Microwave": {
+        "kwh": "100"
+    },
+    "Dishwasher": {
+        "code": "q8py-6w3f",
+        "kwh": "100",
+        "aec": "annual_energy_use_kwh_year"
+    },
+    "Air Conditioner": {
+        "code": "5xn2-dv4h",
+        "kwh": "100",
+        "aec": "annual_energy_use_kwh_yr"
+    }
+}

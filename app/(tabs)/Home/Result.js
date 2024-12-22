@@ -4,15 +4,16 @@ import styles from '../../styles/result.style'
 import mainStyle from '../../styles/general.style';
 import { router, useLocalSearchParams } from 'expo-router';
 
-
 const ResultInfo = () => {
-    const { applianceImageURI,
+    const { 
+            applianceImageURI,
             applianceImageName,
             applianceImageMIME,
             stickerImageURI,
             stickerImageName,
             stickerImageMIME
         } = useLocalSearchParams();
+
     const [loading, setloading] = useState(false)
     const [data, setData] = useState(null);
 
@@ -40,8 +41,7 @@ const ResultInfo = () => {
                     }
                 })
                 if(!response.ok){
-                    alert(response.status)
-                    throw new Error(`Error ${response.status}`)
+                    throw new Error(`Error ${response.status} ${response.statusText}`)
                 }
                 const data = await response.json()
                 setData(data)
@@ -83,23 +83,22 @@ const ResultInfo = () => {
                 <Text style={styles.value}>{data?.predictedClass}</Text>
             </View>
             <View style={styles.infoRow}>
-                <Text style={styles.label}>Brand:</Text>
-                <Text style={styles.value}>{NaN}</Text>
-            </View>
-            <View style={styles.infoRow}>
                 <Text style={styles.label}>Type:</Text>
-                <Text style={styles.value}>{NaN}</Text>
+                <Text style={styles.value}>{data?.subclass}</Text>
             </View>
             <View style={styles.infoRow}>
                 <Text style={styles.label}>Power{'\n'}Consumption:</Text>
-                <Text style={styles.value}>{data?.totalCost}</Text>
+                <Text style={styles.value}>{`$${data?.totalCost}/Year`}</Text>
             </View>
         </View>
-        <TouchableOpacity style={mainStyle.button}>
+        {data && data.predictedClass !== "Microwave" && (
+            <TouchableOpacity style={mainStyle.button}>
                 <Text style={mainStyle.text} onPress={() => alternativesPage()}>Alternatives</Text>
-        </TouchableOpacity></>
-            
+            </TouchableOpacity>
         )}
+        </>
+            
+    )}
         
     </SafeAreaView>
     );
